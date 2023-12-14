@@ -22,7 +22,3 @@ class Categoria:
     @nome.setter
     def nome(self, nome: str):
         self.__nome = nome
-
-    @staticmethod
-    def depositar():
-        return "Opa"
