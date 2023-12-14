@@ -1,19 +1,32 @@
 from model.categoria import Categoria
+from database.client_factory import ClientFactory
+
 
 class CategoriaDAO:
 
     def __init__(self):
         self.__categorias: list[Categoria] = list()
+        self.__client: ClientFactory = ClientFactory()
 
     def listar(self) -> list[Categoria]:
-        return self.__categorias
+        categorias = list()
+
+        client = self.__client.get_client()
+        db = client.livraria
+        for documento in db.categorias.find():
+            cat = Categoria(documento['nome'])
+            cat.id = documento['_id']
+            categorias.append(cat)
+        client.close()
+
+        return categorias
 
     def adicionar(self, categoria: Categoria) -> None:
         self.__categorias.append(categoria)
 
     def remover(self, categoria_id: int) -> bool:
         encontrado = False
-        
+
         for c in self.__categorias:
             if (c.id == categoria_id):
                 index = self.__categorias.index(c)
@@ -29,12 +42,11 @@ class CategoriaDAO:
                 cat = c
                 break
         return cat
-    
+
     def ultimo_id(self) -> int:
-        index = len(self.__categorias) -1
+        index = len(self.__categorias) - 1
         if (index == -1):
             id = 0
         else:
             id = self.__categorias[index].id
         return id
-    
